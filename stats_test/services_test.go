@@ -19,8 +19,6 @@ var (
 )
 
 func TestCreateMachineStats(t *testing.T) {
-	t.Cleanup(test.CleanUp)
-
 	tt := map[string]struct {
 		give            *stats.PostMachineStatsRequest
 		want            error
@@ -44,12 +42,14 @@ func TestCreateMachineStats(t *testing.T) {
 		"should not create new machine stats": {
 			give:            &stats.PostMachineStatsRequest{},
 			want:            errors.New("machineID, stats, lastLoggedIn, and sysTime cannot be empty"),
-			numberOfRecords: 1,
+			numberOfRecords: 0,
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
+			t.Cleanup(test.CleanUp)
+
 			err := stats.CreateMachineStats(tc.give)
 			assert.Equal(t, tc.want, err)
 			assert.Equal(t, tc.numberOfRecords, len(datastore.Data))
